@@ -1,0 +1,163 @@
+﻿
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script src="Zebra.js"></script>
+    <meta charset="utf-8">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" />
+    <!-- width=device-width causes the iPhone 5 to letterbox the app, so
+    we want to exclude it for iPhone 5 to allow full screen apps -->
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1" media="(device-height: 568px)" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <script src="jquery-1.11.0.min.js"></script>
+    <script src="jSignature.min.js"></script>
+    
+
+    <script>
+
+        var z = new zebra();
+
+        //FUNCTIONS:
+        //z.addContent('You can write regular text.  If it goes beyond 47 characters it will auto-wrap the text to a new line');
+        //z.addSmallHeading('Adds a small heading.  Same as above, if it goes beyond 47 characters it willll auto-wrap');
+        //z.addBigHeading('Pretty obvious, but no auto wrap on this one as the font used is not of a fixed size');
+        //z.addBigHeadingTall('Same as above but taller font used');
+        //z.getDocument(); //Returns the text for the document
+        //z.getDocumentBase64Encoded(); //Returns the text encoded in Base64
+        //z.clearDecks(); //Clears the current contents of the document so you can start again
+
+
+
+        function add(ele, type) {
+            var value = ele.value;
+            if (value == null || value == '')
+                alert('A value is required')
+            else {
+                switch (type) {
+                    case 'addContent':
+                        z.addContent(value);
+                        document.getElementById('commands').innerHTML = document.getElementById('commands').innerHTML + '<br />z.addContent(\'' + value + '\');';
+                        break;
+                    case 'addSmallHeading':
+                        z.addSmallHeading(value);
+                        document.getElementById('commands').innerHTML = document.getElementById('commands').innerHTML + '<br />z.addSmallHeading(\'' + value + '\');';
+                        break;
+                    case 'addBigHeading':
+                        z.addBigHeading(value);
+                        document.getElementById('commands').innerHTML = document.getElementById('commands').innerHTML + '<br />z.addBigHeading(\'' + value + '\');';
+                        break;
+                    case 'addBigHeadingTall':
+                        z.addBigHeadingTall(value);
+                        document.getElementById('commands').innerHTML = document.getElementById('commands').innerHTML + '<br />z.addBigHeadingTall(\'' + value + '\');';
+                        break;
+                }
+                show();
+                ele.value = '';
+            }
+        }
+
+        function show() {
+            var replaceAll = function (find, replace, str) {
+                return str.replace(new RegExp(find, 'g'), replace);
+            }
+            document.getElementById('base64output').innerText = 'Arrowhead://x-callback-url/cpclcode?code=' + z.getDocumentBase64Encoded();
+            document.getElementById('rawoutput').innerHTML = replaceAll('\n', '<br />', z.getDocument());
+        }
+
+        function sendToPrinter() {
+            var link = 'Arrowhead://x-callback-url/cpclcode?code=' + z.getDocumentBase64Encoded();
+            window.location = link;
+        }
+
+        function addWhiteSpace() {
+            z.addWhiteSpace();
+            show();
+            document.getElementById('commands').innerHTML = document.getElementById('commands').innerHTML + '<br />z.addWhiteSpace();';
+        }
+        function clearDecks() {
+            z.clearDecks();
+            document.getElementById('commands').innerHTML = document.getElementById('commands').innerHTML + '<br />z.clearDecks();';
+            show();
+        }
+
+        function addSignature() {
+
+            var img = document.createElement('img');
+            img.onload = function () {
+                z.addImage(img);
+                show();
+                document.getElementById('commands').innerHTML = document.getElementById('commands').innerHTML + '<br />z.addImage(<i>Canvas or Image DOM Element</i>);';
+                $('#sig').jSignature('reset');
+            }
+
+            img.src = $('#sig').jSignature('getData');
+
+            //var sigCanvas = $('#sig canvas')[0];
+            //var canvas = document.createElement('canvas');
+            //canvas.width = sigCanvas.width;
+            //canvas.height = sigCanvas.height
+            //var ctx = canvas.getContext('2d');
+            //ctx.drawImage(sigCanvas, 0, 0, canvas.width, canvas.height);
+
+            //z.addImage(canvas);
+            ////$('#sig').jSignature('reset');
+            //show();
+            //document.getElementById('commands').innerHTML = document.getElementById('commands').innerHTML + '<br />z.addImage(<i>Canvas DOM Element</i>);'
+        }
+
+        $(document).ready(function () {
+            $('#sig').jSignature({ height: '200px', width: '300px', color: "#00f", lineWidth: 2 });
+        });
+
+    </script>
+    <style>
+        button {
+            width: 235px;
+            height: 30px;
+        }
+
+        input[type="text"] {
+            width: 235px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Build your document - add the types of content you wish.</h1>
+    <input type="text" id="addBigHeadingTall" /><br /><button onclick="add(document.getElementById('addBigHeadingTall'), 'addBigHeadingTall');">Add Big Heading Tall</button>
+    <br /><br />
+    <input type="text" id="addBigHeading" /><br /><button onclick="add(document.getElementById('addBigHeading'), 'addBigHeading');">Add Big Heading</button>
+    <br /><br />
+    <input type="text" id="addSmallHeading" /><br /><button onclick="add(document.getElementById('addSmallHeading'), 'addSmallHeading');">Add Small Heading</button>
+    <br /><br />
+    <input type="text" id="addContent" /><br /><button onclick="add(document.getElementById('addContent'), 'addContent');">Add Content</button>
+    <br /><br />
+    
+    <button onclick="addWhiteSpace();">Add White Space</button><br /><br /><button onclick="clearDecks();">Clear Decks</button>
+    <br /><br />
+    
+    <div id="sig" style="width:300px; height:200px;border: 1px solid black;"></div><br />
+    <button onclick="addSignature();">Add To Document</button>
+    <br /><br />
+    <div id="commands"><h3>Commands</h3>var z = new zebra();</div>
+    z.getDocument(); //Returns the text for the document<br />
+    z.getDocumentBase64Encoded(); //Returns the text encoded in Base64
+    <br /><br />
+    <h3>This is the web link contents</h3>
+    <div id="base64output"></div>
+    <br /><br />
+    <h3>This is the raw CPCL output</h3>
+    <div id="rawoutput"></div>
+    <br /><br />
+    <button onclick="sendToPrinter();">Click this link to send to printer</button>
+    <br /><br /><br />
+
+</body>
+</html>
