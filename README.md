@@ -12,4 +12,6 @@ CPCL information can be found here: http://www.zebra.com/content/dam/zebra/manua
 
 Limitations
 ===========
-Currently limited to Zebra 3" format printers using CPCL.  Further developments will allow template based formatting to allow you to
+Currently limited to Zebra 3" format printers using CPCL.  
+
+If people express interest (or if you fork it), I'll build for different width sizes.
